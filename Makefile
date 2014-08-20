@@ -1,32 +1,21 @@
-LD=i386-elf-ld
-RUSTC=rustc
-NASM=nasm
-QEMU=qemu-system-i386
+QEMU 					?= qemu-system-i386
+QEMU_FLAGS		?= -boot order=dca
 
-all: floppy.img
+ISO_IMAGE			?= rustix.iso
 
-.SUFFIXES: .o .rs .asm
+.PHONY: all run clean all_kernel clean_kernel
 
-.PHONY: clean run
+all: all_kernel
 
-.rs.o:
-	$(RUSTC) -O --target i386-intel-linux --crate-type lib -o $@ --emit obj $<
+all_kernel:
+	@ cd kernel && $(MAKE) all
 
-.asm.o:
-	$(NASM) -f elf32 -o $@ $<
+clean: clean_kernel
 
-floppy.img: loader.bin main.bin
-	dd if=/dev/zero of=$@ bs=512 count=2 &>/dev/null
-	cat $^ | dd if=/dev/stdin of=$@ conv=notrunc &>/dev/null
+clean_kernel:
+	@ cd kernel && $(MAKE) clean
 
-loader.bin: loader.asm
-	$(NASM) -o $@ -f bin $<
+run:
+	@ $(QEMU) $(QEMU_FLAGS) -cdrom kernel/$(ISO_IMAGE) -serial stdio
 
-main.bin: linker.ld main.o
-	$(LD) -m elf_i386 -o $@ -T $^
 
-run: floppy.img
-	$(QEMU) -fda $<
-
-clean:
-	rm -f *.bin *.o *.img
