@@ -1,3 +1,4 @@
+section .stage1
 use16
 
 _start:
@@ -64,7 +65,7 @@ a20_disabled:
 
   mov si, message_stage2
   call puts16
-  cli ; Make sure interrupts are disabled 
+
   jmp stage2_start ; jump to stage 2
 
 error:

@@ -3,3 +3,5 @@
 *.bin
 *.o
 .vagrant/
+kernel/rustix.*
+kernel/symbols.dbg

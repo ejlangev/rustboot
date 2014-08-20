@@ -1,5 +1,6 @@
 QEMU 					?= qemu-system-i386
-QEMU_FLAGS		?= -boot order=dca
+QEMU_FLAGS		?= -boot order=dca --no-kvm -k en-us
+QEMU_MEMORY		?= 32
 
 ISO_IMAGE			?= rustix.iso
 
@@ -16,6 +17,6 @@ clean_kernel:
 	@ cd kernel && $(MAKE) clean
 
 run:
-	@ $(QEMU) $(QEMU_FLAGS) -cdrom kernel/$(ISO_IMAGE) -serial stdio
+	@ $(QEMU) $(QEMU_FLAGS) -m $(QEMU_MEMORY) -cdrom kernel/$(ISO_IMAGE) -serial stdio
 
 
